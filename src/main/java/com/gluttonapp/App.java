@@ -6,12 +6,14 @@ import org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.List;
 import java.util.Scanner;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 
 public class App {
     public static void main(String[] args) {
@@ -65,11 +67,14 @@ public class App {
                     //Find Friends
                     System.out.println("friends found: \r\n" + getFriends(g));
                     break;
+                case 9:
+                    //Find Friends of Friends
+                    System.out.println("friends of friends found: \r\n" + getFriendsOfFriends(g));
+                    break;
                 default:
                     System.out.println("Sorry, please enter valid Option");
             }
         }
-
         System.out.println("Exiting GluttonApp, Bye!");
     }
 
@@ -88,6 +93,7 @@ public class App {
         System.out.println("6) Delete person Vertex");
         System.out.println("7) Add is_friends_with Edge");
         System.out.println("8) Find friends of a person");
+        System.out.println("9) Find friends of friends of a person");
         System.out.println("0) Quit");
         System.out.println("--------------");
         System.out.println("Enter your choice:");
@@ -184,6 +190,22 @@ public class App {
                 values("name").toList();
 
         return StringUtils.join(friends, "\r\n");
+    }
+
+    private static String getFriendsOfFriends(GraphTraversalSource g) {
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Enter the name of the person to find the friends of their friends:");
+        String name = keyboard.nextLine();
+
+        // List of objects
+        List<Object> foff = g.V().
+                has("person", "name", name).
+                repeat(
+                        out("is_friends_with")
+                ).times(2).
+                dedup().values("name").toList();
+
+        return StringUtils.join(foff, "\r\n");
     }
 
     private static Cluster connectToDatabase() {
