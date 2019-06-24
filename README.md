@@ -8,7 +8,7 @@ compile application
 mvn clean compile
 ```
 
-run application
+compile and run application
 ```bash
-mvn -1 clean compile exec:java -Dexec.mainClass="com.gluttonapp.App"
+mvn -q clean compile exec:java -Dexec.mainClass="com.gluttonapp.App"
 ```
